@@ -286,17 +286,35 @@ class AuthController extends Controller
         return response()->json(['message' => 'Error: Recipe not liked'], 400);
     }
     public function createComment(Request $request)
-    {$recipe_id = $request->recipe_id; 
+    {   $recipe_id = $request->recipe_id; 
         $user = Auth::user();
         $comment = new Comment();
 
-        $comment->body = $request->input('body');
+        $comment->body = $request->body;
         $comment->user_id = $user->id;
-        $comment->recipe_id = $request->input('recipe_id');
+        $comment->recipe_id = $request->recipe_id;
 
         $comment->save();
 
         return response()->json(['message' => 'Comment created successfully', 'comment' => $comment],200);
     }
+    
+    public function deleteComment(Request $request, $comment_id)
+    {
+        $user = Auth::user();
+        $comment = Comment::find($comment_id);
 
+        if (!$comment) {
+            return response()->json(['message' => 'Comment not found'], 404);
+        }
+
+       
+        if ($user->id !== $comment->user_id) {
+            return unauthorized();
+        }
+
+        $comment->delete();
+
+        return response()->json(['message' => 'Comment deleted successfully']);
+    }
 }
