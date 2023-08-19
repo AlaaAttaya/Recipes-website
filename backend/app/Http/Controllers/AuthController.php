@@ -10,6 +10,7 @@ use App\Models\Follower;
 use App\Models\Post;
 use App\Models\Like;
 use Illuminate\Support\Facades\DB;
+use App\Models\Recipe;
 
 class AuthController extends Controller
 {
@@ -77,7 +78,7 @@ class AuthController extends Controller
         
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/images');
+            $imagePath = $request->file('image')->store('public/images/u_'.$user->id.'_'.$request->username);
             $image_path  = "/storage".str_replace('public', '', $imagePath);
         }else {
             
@@ -123,159 +124,179 @@ class AuthController extends Controller
         ]);
     }
 
-    public function getAllUsers($id = null)
+    public function getAllUsers(Request $request)
     {
-        if ($id !== null) {
-            $user = User::find($id);
-    
-            if (!$user) {
-                return response()->json([
-                    'status' => 'Error',
-                    'message' => 'User not found',
-                ], 404);
-            }
-    
-            return response()->json([
-                'status' => 'Success',
-                'data' => $user,
-            ]);
+        $searchUsername=$request->username;
+        if ($searchUsername !== null) {
+            $users = User::where('username', 'like', '%' . $searchUsername . '%')->get();
+        } else {
+            $users = [];
         }
-    
-        $users = User::all();
-    
+
         return response()->json([
             'status' => 'Success',
             'data' => $users,
         ]);
     }
 
-    public function createPost(Request $request)
+
+    //Recipes
+
+    
+    public function createRecipe(Request $request)
     {
         $user = Auth::user();
-    
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,ico|max:2048',
-            'description' => 'nullable|string',
-        ]);
-    
-      
-        $post = new Post();
-        $post->user_id = $user->id;
-        $post->description = $request->input('description');
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/posts/posts_'.$user->id);
-            $image_Path = "/storage" . str_replace('public', '', $imagePath);
-            $post->image_url = $image_Path;
-        }
-    
-
-        $post->save();
-    
-        return response()->json([
-            'status' => 'Success',
-            'data' => $post,
-        ]);
-    }
-
-
-    public function likePost($postId)
-    {
-        $user = Auth::user();
-        $post = Post::find($postId);
-    
-        if (!$post) {
-            return response()->json([
-                'status' => 'Error',
-                'message' => 'Post not found.',
-            ], 404);
-        }
-    
         
-        $existingLike = Like::where('user_id', $user->id)
-                             ->where('post_id', $postId)
-                             ->first();
-    
-        if ($existingLike) {
-            return response()->json([
-                'status' => 'Error',
-                'message' => 'Post already liked',
-            ], 400);
-        }
-    
-        $post->likes_count += 1;
-        $post->save();
-    
-        $like = new Like();
-        $like->user_id = $user->id;
-        $like->post_id = $postId;
-        $like->save();
-    
-        return response()->json([
-            'status' => 'Success',
-            'message' => 'Post liked.',
-            'data' => $post,
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:100',
+            'cuisine' => 'required|string|max:50',
+            'image_url' => 'image|mimes:jpeg,png,jpg|max:2048', 
+            'ingredients' => 'required|json', 
         ]);
-    }
+        $image= $request->image_url;
     
-    public function unlikePost($postId)
+        if ($image) {
+            $imagePath = $image->store('public/images/u_' . $user->id . '_' . $user->username.'/recipes');
+            $image_path= "/storage" . str_replace('public', '', $imagePath);
+        } else {
+            $image_path= '/storage/images/profilepic.png';
+        }
+
+     
+        $recipe = new Recipe();
+        $recipe->name = $validatedData['name'];
+        $recipe->cuisine = $validatedData['cuisine'];
+        $recipe->image_url = $image_path;
+        $recipe->user_id = $user->id;
+        $recipe->ingredients = $validatedData['ingredients']; 
+        $recipe->save();
+      
+        return response()->json(['message' => 'Recipe created successfully', 'recipe' => $recipe], 201);
+    }
+
+    
+    public function updateRecipe(Request $request )
+    {$recipe_id = $request->recipe_id; 
+        $user = Auth::user();
+        $recipe = Recipe::find($recipe_id);
+
+        if (!$recipe) {
+            return response()->json(['message' => 'Recipe not found'], 404);
+        }
+
+     
+
+       
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:100',
+            'cuisine' => 'required|string|max:50',
+            'image_url' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'ingredients' => 'required|json', 
+        ]);
+
+        $image=$request->image_url;
+      
+        if ($image) {
+            $imagePath = $image->store('public/images/u_' . $user->id . '_' . $user->username.'/recipes');
+            $image_path= "/storage" . str_replace('public', '', $imagePath);
+        } else {
+            $image_path= '/storage/images/profilepic.png';
+        }
+
+        $recipe->name = $request->name;
+        $recipe->cuisine = $request->cuisine;
+        $recipe->image_url = $image_path;
+        
+        $recipe->ingredients = $request->ingredients; 
+        $recipe->save();
+       
+     
+
+        return response()->json(['message' => 'Recipe updated successfully', 'recipe' => $recipe]);
+    }
+
+
+  
+    public function removeRecipe(Request $request)
+    {  $recipe_id = $request->recipe_id; 
+        $user = Auth::user();
+        $recipe = Recipe::find($recipe_id);
+
+        if (!$recipe) {
+            return response()->json(['message' => 'Recipe not found'], 404);
+        }
+
+        
+        if ($user->id !== $recipe->user_id) {
+            return unauthorized();
+        }
+
+        $recipe->delete();
+
+        return response()->json(['message' => 'Recipe removed successfully']);
+
+    }
+
+
+    public function getUserRecipes(Request $request)
     {
         $user = Auth::user();
-        $post = Post::find($postId);
-        $existingLike = Like::where('user_id', $user->id)
-        ->where('post_id', $postId)
-        ->first();
+        $recipes = $user->recipes()->withCount('likes')->with('comments')->get();
+        return response()->json(['recipes' => $recipes]);
+    }
 
-        if (!$existingLike) {
-        return response()->json([
-        'status' => 'Error',
-        'message' => 'Post already Unliked',
-        ], 400);
-        }
+    public function likeRecipe(Request $request)
+    {   $recipe_id = $request->recipe_id; 
+        $user = Auth::user();
 
-        if (!$post) {
-            return response()->json([
-                'status' => 'Error',
-                'message' => 'Post not found.',
-            ], 404);
-        }
-    
        
-        $post->likes_count -= 1;
-        $post->save();
-    
-      
-        Like::where('user_id', $user->id)->where('post_id', $postId)->delete();
-    
-        return response()->json([
-            'status' => 'Success',
-            'message' => 'Post unliked.',
-            'data' => $post,
-        ]);
-    }
+        $existingLike = Like::where('user_id', $user->id)
+            ->where('recipe_id', $recipe_id)
+            ->first();
 
-    public function getPostsForUser()
-    {
-        $loggedInUser = Auth::user();
-
-        if (!$loggedInUser) {
-            return $this->unauthorized();
+        if ($existingLike) {
+            return response()->json(['message' => 'Recipe already liked'], 400);
         }
 
-    
-        $posts = Post::with('userData')->where('user_id', $loggedInUser->id)->get();
+       
+        $like= new Like;
+        $like->user_id= $user->id;
+        $like->recipe_id = $recipe_id;
+        $like->save();
 
-        return response()->json([
-            'status' => 'Success',
-            'data' => $posts,
-        ]);
+        return response()->json(['likesCount' => $recipe->likes->count()]);
     }
 
+    public function unlikeRecipe(Request $request)
+    {  $recipe_id = $request->recipe_id; 
+        $user = Auth::user();
 
+     
+        $existingLike = Like::where('user_id', $user->id)
+            ->where('recipe_id', $recipe_id)
+            ->first();
 
+        if ($existingLike) {
+            $existingLike->delete();
+            $recipe = Recipe::withCount('likes')->find($recipe_id);
+            return response()->json(['message' => 'Recipe unliked', 'likesCount' => $recipe->likes_count]);
+        }
 
+        return response()->json(['message' => 'Error: Recipe not liked'], 400);
+    }
+    public function createComment(Request $request)
+    {$recipe_id = $request->recipe_id; 
+        $user = Auth::user();
+        $comment = new Comment();
 
+        $comment->body = $request->input('body');
+        $comment->user_id = $user->id;
+        $comment->recipe_id = $request->input('recipe_id');
 
+        $comment->save();
 
-    
+        return response()->json(['message' => 'Comment created successfully', 'comment' => $comment],200);
+    }
+
 }
