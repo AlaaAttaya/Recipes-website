@@ -12,10 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('recipe_id');
+          
             $table->timestamps();
 
-            $table->foreign('recipe_id')->references('id')->on('recipes')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

@@ -14,8 +14,9 @@ class ShoppingList extends Model
         return $this->belongsToMany(Recipe::class);
     }
 
-    public function shoppingLists()
+    public function user()
     {
-        return $this->belongsToMany(ShoppingList::class);
+        return $this->belongsTo(User::class);
     }
+    
 }

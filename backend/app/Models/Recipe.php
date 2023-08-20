@@ -31,5 +31,8 @@ class Recipe extends Model
     {
         return $this->hasMany(Comment::class);
     }
-
+    public function shoppingLists()
+    {
+        return $this->belongsToMany(ShoppingList::class);
+    }
 }
