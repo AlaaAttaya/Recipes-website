@@ -15,7 +15,7 @@ use App\Models\Recipe;
 class AuthController extends Controller
 {
 
-  
+  //User
 
     public function unauthorized(Request $request)
     {
@@ -182,7 +182,7 @@ class AuthController extends Controller
         $recipe = Recipe::find($recipe_id);
 
         if (!$recipe) {
-            return response()->json(['message' => 'Recipe not found'], 404);
+            return response()->json(['message' => 'Recipe not found']);
         }
 
      
@@ -224,7 +224,7 @@ class AuthController extends Controller
         $recipe = Recipe::find($recipe_id);
 
         if (!$recipe) {
-            return response()->json(['message' => 'Recipe not found'], 404);
+            return response()->json(['message' => 'Recipe not found']);
         }
 
         
@@ -256,7 +256,7 @@ class AuthController extends Controller
             ->first();
 
         if ($existingLike) {
-            return response()->json(['message' => 'Recipe already liked'], 400);
+            return response()->json(['message' => 'Recipe already liked']);
         }
 
        
@@ -283,8 +283,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Recipe unliked', 'likesCount' => $recipe->likes_count]);
         }
 
-        return response()->json(['message' => 'Error: Recipe not liked'], 400);
+        return response()->json(['message' => 'Error: Recipe not liked']);
     }
+
+
+
     public function createComment(Request $request)
     {   $recipe_id = $request->recipe_id; 
         $user = Auth::user();
@@ -305,7 +308,7 @@ class AuthController extends Controller
         $comment = Comment::find($comment_id);
 
         if (!$comment) {
-            return response()->json(['message' => 'Comment not found'], 404);
+            return response()->json(['message' => 'Comment not found']);
         }
 
        
@@ -317,4 +320,48 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Comment deleted successfully']);
     }
+
+
+    
+//Shopping List
+
+    public function addRecipeShoppingList(Request $request)
+    {  
+        $user = Auth::user();
+        $recipeId = $request->recipe_id;
+        
+      
+        $recipe = Recipe::find($recipeId);
+        if (!$recipe) {
+            return response()->json(['message' => 'Recipe not found']);
+        }
+    
+        if ($user->shoppingLists->contains($recipeId)) {
+            return response()->json(['message' => 'Recipe already in shopping list']);
+        }
+        
+        $user->shoppingLists()->attach($recipeId);
+    
+        return response()->json(['message' => 'Recipe added to shopping list']);
+    }
+
+    public function removeRecipeShoppingList(Request $request)
+    {  
+        $user = Auth::user();
+        $recipe_id = $request->recipe_id; 
+        
+        
+        $recipe = Recipe::find($recipeId);
+        if (!$recipe) {
+            return response()->json(['message' => 'Recipe not found']);
+        }
+    
+        
+        $user->shoppingLists()->detach($recipeId);
+
+        return response()->json(['message' => 'Recipe removed from shopping list']);
+    }
+
+
+
 }
