@@ -50,13 +50,14 @@ const LoginPage = () => {
           src={require("../assets/images/RECIPEREALM.svg").default}
           alt="REACTREALM"
         />
-
+        <label className="login-label">Username</label>
         <input
           type="text"
           placeholder="Username or email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
+        <label className="login-label">Password</label>
         <input
           type="password"
           placeholder="Password"

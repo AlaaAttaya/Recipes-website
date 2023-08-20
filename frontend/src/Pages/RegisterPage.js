@@ -45,25 +45,28 @@ const RegisterPage = () => {
           src={require("../assets/images/RECIPEREALM.svg").default}
           alt="REACTREALM"
         />
+        <label className="signup-label">Email</label>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        <label className="signup-label">Name</label>
         <input
           type="text"
           placeholder="Full Name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
         />
+        <label className="signup-label">Username</label>
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-
+        <label className="signup-label">Password</label>
         <input
           type="password"
           placeholder="Password"

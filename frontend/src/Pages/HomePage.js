@@ -10,24 +10,11 @@ const HomePage = () => {
     window.location.replace("/");
   }
   return (
-    <div className="home-body">
-      <Navbar />
-      <div className="home-content">
-        <Post></Post>
+    <>
+      <div className="home-body">
+        <Navbar />
       </div>
-      <div className="home-profilelink">
-        <div className="homepage-profilediv">
-          <Avatar
-            image={"../images/profilepic.png"}
-            namito="HomePage-Profilepic"
-          />
-          <div className="userfullname-div">
-            <label className="username-label">username</label>
-            <label className="fullname-label">fullname</label>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

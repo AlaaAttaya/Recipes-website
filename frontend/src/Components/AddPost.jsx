@@ -7,7 +7,7 @@ const AddProfile = () => {
     <div className="post-wrapper">
       <div className="post-image">
         <img
-          className=""
+          className="post-img"
           src={require("../assets/images/RECIPEREALM.svg").default}
           alt="post_img"
           style={{ width: "300px", height: "300px" }}
