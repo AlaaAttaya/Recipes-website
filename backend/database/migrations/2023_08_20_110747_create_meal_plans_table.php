@@ -6,23 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    { 
-            Schema::create('shopping_lists', function (Blueprint $table) {
+    public function up()
+    {
+        Schema::create('meal_plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('recipe_id');
             $table->timestamps();
 
-            $table->foreign('recipe_id')->references('id')->on('recipes')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('shopping_lists');
+        Schema::dropIfExists('meal_plans');
     }
 
+    
 };

@@ -94,7 +94,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(MealPlan::class);
     }
 
-
+    public function days()
+    {
+        return $this->hasMany(Day::class);
+    }
   
 
 

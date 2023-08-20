@@ -325,6 +325,39 @@ class AuthController extends Controller
     
 //Shopping List
 
+    public function createShoppingList(Request $request)
+    {
+        $user = Auth::user();
+        
+        $shoppingList = new ShoppingList();
+        $shoppingList->name = $request->name;
+        $shoppingList->user_id = $user->id;
+        $shoppingList->save();
+
+        return response()->json(['message' => 'Shopping list created successfully', 'shoppingList' => $shoppingList]);
+    }
+
+    public function removeShoppingList(Request $request)
+    {
+        $user = Auth::user();
+        $shoppingListId = $request->shoppingListId;
+
+        $shoppingList = ShoppingList::find($shoppingListId);
+        if (!$shoppingList) {
+            return response()->json(['message' => 'Shopping List not found']);
+        }
+    
+
+        if ($shoppingList->user_id !== $user->id) {
+            return unauthorized();
+        }
+
+        $shoppingList->delete();
+
+        return response()->json(['message' => 'Shopping list removed successfully']);
+    }
+
+
     public function addRecipeShoppingList(Request $request)
     {  
         $user = Auth::user();
@@ -342,7 +375,7 @@ class AuthController extends Controller
         
         $user->shoppingLists()->attach($recipeId);
     
-        return response()->json(['message' => 'Recipe added to shopping list']);
+        return response()->json(['message' => 'Recipe added to shopping list','shoppingList' => $updatedShoppingList]);
     }
 
     public function removeRecipeShoppingList(Request $request)
@@ -356,12 +389,116 @@ class AuthController extends Controller
             return response()->json(['message' => 'Recipe not found']);
         }
     
-        
+
         $user->shoppingLists()->detach($recipeId);
 
         return response()->json(['message' => 'Recipe removed from shopping list']);
     }
 
 
+//Meal Planner
+    public function createMealPlan(Request $request)
+    {
+        $user = Auth::user();
+
+        $mealPlan = new MealPlan;
+    
+        $mealPlan->name = $request->name;
+        $mealPlan->user_id = $user->id;
+    
+        $mealPlan->save();
+
+        return response()->json(['message' => 'Meal plan created successfully', 'mealPlan' => $mealPlan]);
+    }
+
+        public function addDayToMealPlan(Request $request)
+    {  
+        $mealPlanId=$request->mealPlanId;
+        $user = Auth::user();
+
+        $mealPlan = MealPlan::where('user_id', $user->id)->find($mealPlanId);
+
+        if(!$mealPlan){
+
+            return response()->json(['message' => 'Meal Plan not found']);
+        }
+
+        $day = new Day;
+        $day->name = $request->name;
+        $mealPlan->days()->save($day);
+
+        return response()->json(['message' => 'Day added to meal plan', 'day' => $day]);
+    }
+
+        public function addRecipesToDay(Request $request)
+    {
+        $user = Auth::user();
+        $mealPlanId=$request->mealPlanId;
+        $dayId=$request->dayId;
+
+        $mealPlan = MealPlan::where('user_id', $user->id)->find($mealPlanId);
+
+        if(!$mealPlan){
+            return response()->json(['message' => 'Meal Plan not found']);
+        }
+
+        $day = $mealPlan->days()->find($dayId);
+
+        if(!$day){
+            return response()->json(['message' => 'Day not found']);
+        }
+
+        $recipeIds = $request->recipe_id; 
+
+        $day->recipes()->sync($recipeIds);
+
+        return response()->json(['message' => 'Recipes added to day', 'day' => $day]);
+    }
+        public function getMealPlans(Request $request)
+    {
+        $user = Auth::user();
+
+        $mealPlans = $user->mealPlans()->with('days.recipes')->get();
+
+        return response()->json(['mealPlans' => $mealPlans]);
+    }
+    
+        public function removeRecipeFromDay(Request $request)
+    {
+        $user = Auth::user();
+        $mealPlanId=$request->mealPlanId;
+        $dayId=$request->dayId;
+        $recipeId=$request->reecipeId;
+
+        $mealPlan = MealPlan::where('user_id', $user->id)->find($mealPlanId);
+
+        if(!$mealPlan){
+            return response()->json(['message' => 'Meal Plan not found']);
+        }
+
+        $day = $mealPlan->days()->find($dayId);
+
+         if(!$day){
+            return response()->json(['message' => 'Day not found']);
+        }
+
+        $day->recipes()->detach($recipeId);
+
+        return response()->json(['message' => 'Recipe removed from day']);
+    }
+        public function deleteMealPlan(Request $request)
+    {
+        $user = Auth::user();
+        $mealPlanId=$request->mealPlanId;
+        $mealPlan = MealPlan::where('user_id', $user->id)->find($mealPlanId);
+
+        if(!$mealPlan){
+             return response()->json(['message' => 'Meal Plan not found']);
+        }
+        
+        $mealPlan->delete();
+
+        return response()->json(['message' => 'Meal plan deleted']);
+    }
 
 }
