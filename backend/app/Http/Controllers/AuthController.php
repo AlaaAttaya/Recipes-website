@@ -248,7 +248,12 @@ class AuthController extends Controller
         $recipes = $user->recipes()->withCount('likes')->with('comments')->get();
         return response()->json(['recipes' => $recipes]);
     }
-
+    public function getAllRecipes(Request $request)
+    {
+        $user = Auth::user();
+        $recipes = $user->recipes()->withCount('likes')->with('comments')->get();
+        return response()->json(['recipes' => $recipes]);
+    }
     public function likeRecipe(Request $request)
     {   $recipe_id = $request->recipe_id; 
         $user = Auth::user();

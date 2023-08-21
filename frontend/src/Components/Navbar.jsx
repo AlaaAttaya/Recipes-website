@@ -2,16 +2,29 @@ import React, { useState, useEffect } from "react";
 import "../styles/styles.css";
 import Avatar from "./Avatar";
 
-const Navbar = () => {
+const Navbar = ({ onBurgerClick }) => {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [burgermenuOpen, setburgermenuOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.replace("/");
   };
+  const handleHome = () => {
+    window.location.replace("/Home");
+  };
 
-  const handleDropdownClick = () => {
+  const handleProfile = () => {
+    window.location.replace("/Profile");
+  };
+
+  const handleBurgerClick = () => {
+    setburgermenuOpen(!burgermenuOpen);
+    onBurgerClick();
+  };
+
+  const handleAvatarClick = () => {
     setMenuOpen(!menuOpen);
   };
 
@@ -27,6 +40,8 @@ const Navbar = () => {
       setUser(userData);
     } catch (error) {
       console.error("Error fetching user profile:", error);
+      localStorage.removeItem("token");
+      window.location.replace("/");
     }
   };
 
@@ -36,20 +51,27 @@ const Navbar = () => {
 
   return (
     <div className="navbar-container">
+      <div className="burger-icon" onClick={handleBurgerClick}>
+        <div className="burger-line" />
+        <div className="burger-line" />
+        <div className="burger-line" />
+      </div>
       <div className="logo-container">
-        <span className="logo-text">RECIPE REALM</span>
+        <span className="logo-text" onClick={handleHome}>
+          RECIPE REALM
+        </span>
       </div>
       <div className="navbar-menu">
         {user && (
-          <div className="dropdown" onClick={handleDropdownClick}>
+          <div className="dropdown" onClick={handleAvatarClick}>
             <Avatar
               classnaming="navbar-img"
               image={`http://127.0.0.1:8000${user.data.image}`}
             />
             {menuOpen && (
               <div className="dropdown-menu">
-                <button onClick="" className="btn-dropdown">
-                  Profile
+                <button onClick={handleProfile} className="btn-dropdown">
+                  Settings
                 </button>
                 <button onClick={handleLogout} className="btn-dropdown">
                   Log out

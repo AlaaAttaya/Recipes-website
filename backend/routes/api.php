@@ -14,6 +14,7 @@ Route::group(["middleware" => "auth:api"], function () {
 
         Route::post("createrecipe", [AuthController::class, "createRecipe"]);
         Route::get("getrecipes", [AuthController::class, "getUserRecipes"]);
+        Route::get("getallrecipes", [AuthController::class, "getAllRecipes"]);
         Route::post('updaterecipe', [AuthController::class, 'updateRecipe']);
         Route::delete('deleterecipe', [AuthController::class, 'removeRecipe']);
 
