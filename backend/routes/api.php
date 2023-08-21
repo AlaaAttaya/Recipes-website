@@ -11,6 +11,9 @@ Route::group(["middleware" => "auth:api"], function () {
         Route::post("logout", [AuthController::class, "logout"]);
         Route::post("refresh", [AuthController::class, "refresh"]);
         Route::get("search", [AuthController::class, "getAllUsers"]);
+        Route::post('editprofile', [AuthController::class, "editProfile"]);
+        Route::post('changepassword',  [AuthController::class, "changePassword"]);
+
 
         Route::post("createrecipe", [AuthController::class, "createRecipe"]);
         Route::get("getrecipes", [AuthController::class, "getUserRecipes"]);
