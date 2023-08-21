@@ -2,10 +2,25 @@ import React, { useState } from "react";
 import Avatar from "./Avatar";
 import "../styles/styles.css";
 
-const RecipeCard = ({ recipe }) => {
-  const { user, name, cuisine, ingredients, images } = recipe;
+const RecipeCard = ({ recipe, user }) => {
+  console.log(recipe.images);
+  const {
+    name,
+    cuisine,
+    ingredients,
+    images,
+    likes_count,
+    comments,
+    comments_count,
+  } = recipe;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showComments, setShowComments] = useState(false);
 
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
+  console.log("recipeee", images);
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
@@ -17,25 +32,36 @@ const RecipeCard = ({ recipe }) => {
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
-
+  const parsedIngredients = JSON.parse(ingredients);
+  console.log(parsedIngredients);
   return (
     <div className="recipe-card">
       <div className="recipe-card-container">
         <div className="user-info">
-          <Avatar image={user.avatar} classnaming="avatar" />
-          <span className="username">{user.name}</span>
+          <Avatar
+            image={`http://127.0.0.1:8000${user.image}`}
+            classnaming="recipepost-img"
+          />
+          <div className="username-wrapper">
+            <span className="username">{user.username}</span>
+            <span className="name">{user.name}</span>
+          </div>
         </div>
-
         <div className="recipe-details">
-          <h3 className="recipe-name">{name}</h3>
-          <p className="cuisine">Cuisine: {cuisine}</p>
+          <hr style={{ marginRight: "10px" }}></hr>
+          <h3 className="recipe-name">Name: {name}</h3>
+          <h4 className="cuisine">Cuisine: {cuisine}</h4>
 
           <div className="recipe-images">
             <div className="recipe-images-container">
-              <img
-                src={images[currentImageIndex]}
-                alt={`Recipe ${currentImageIndex}`}
-              />
+              {images.length > 0 ? (
+                <img
+                  src={`http://127.0.0.1:8000${images[currentImageIndex].image_url}`}
+                  alt={`Recipe ${currentImageIndex}`}
+                />
+              ) : (
+                <label style={{ marginLeft: "120px" }}>No Images</label>
+              )}
             </div>
           </div>
 
@@ -75,13 +101,21 @@ const RecipeCard = ({ recipe }) => {
         <div className="ingredients">
           <h4>Ingredients:</h4>
           <ul>
-            {ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
+            {Object.entries(parsedIngredients).map(
+              ([ingredient, amount], index) => (
+                <li key={index}>
+                  {ingredient}:{amount}
+                </li>
+              )
+            )}
           </ul>
         </div>
         <div className="interaction-info">
-          <label className="likes-label"> 0 Likes</label>
+          <label className="interactions-label"> {likes_count} Likes</label>
+          <label className="interactions-label">
+            {" "}
+            {comments_count} Comments
+          </label>
         </div>
         <div className="interactions">
           <button className="like-button" style={{ marginLeft: "10px" }}>
@@ -100,7 +134,7 @@ const RecipeCard = ({ recipe }) => {
               />
             </svg>
           </button>
-          <button className="comment-button">
+          <button className="comment-button" onClick={toggleComments}>
             <svg
               fill="#ffffff"
               width="25px"
@@ -129,6 +163,16 @@ const RecipeCard = ({ recipe }) => {
             </svg>
           </button>
         </div>
+        {showComments && (
+          <div className="Comments">
+            <h4>Comments</h4>
+            <ul>
+              {comments.map((comment, index) => (
+                <li key={index}>{comment}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

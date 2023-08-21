@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/styles.css";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
-
+import Recipe from "../Components/Recipe";
 const HomePage = () => {
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(false);
+  const [userRecipes, setAllRecipes] = useState([]);
 
   const handleBurgerClick = () => {
     setIsLeftDivOpen(!isLeftDivOpen);
@@ -21,6 +22,28 @@ const HomePage = () => {
   if (!localStorage.getItem("token")) {
     window.location.replace("/");
   }
+  const fetchAllRecipes = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/user/getallrecipes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const recipes = response.data.recipes;
+
+      setAllRecipes(recipes);
+    } catch (error) {
+      console.error("Error fetching user recipes:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllRecipes();
+  }, []);
+
   return (
     <>
       <div className="home-body">
@@ -83,6 +106,11 @@ const HomePage = () => {
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
+          </div>
+          <div className="Recipes">
+            {userRecipes.map((recipe, index) => (
+              <Recipe key={index} recipe={recipe} user={recipe.user} />
+            ))}
           </div>
         </div>
       </div>

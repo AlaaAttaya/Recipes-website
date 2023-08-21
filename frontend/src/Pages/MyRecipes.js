@@ -1,32 +1,47 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/styles.css";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
 import Recipe from "../Components/Recipe";
 const MyRecipe = () => {
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(false);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [user, setUser] = useState(null);
   const handleBurgerClick = () => {
     setIsLeftDivOpen(!isLeftDivOpen);
   };
+
   const handleRecipe = () => {
     window.location.replace("/MyRecipes");
   };
+
   const handleHome = () => {
     window.location.replace("/Home");
   };
-  const sampleRecipe = {
-    user: {
-      avatar: "user-avatar.jpg",
-      name: "John Doe",
-    },
-    name: "Delicious Pasta",
-    cuisine: "Italian",
-    ingredients: ["Pasta", "Tomato Sauce", "Parmesan"],
-    images: [
-      require("../assets/images/profilepic.png"),
-      require("../assets/images/RECIPEREALM.svg"),
-    ],
+
+  const fetchUserRecipes = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/user/getrecipes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const recipes = response.data.recipes;
+      const user = response.data.user;
+
+      setUser(user);
+      setUserRecipes(recipes);
+    } catch (error) {
+      console.error("Error fetching user recipes:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchUserRecipes();
+  }, []);
 
   return (
     <div className="home-page">
@@ -68,7 +83,9 @@ const MyRecipe = () => {
         </div>
       </div>
       <div className="recipes-container">
-        <Recipe recipe={sampleRecipe} />
+        {userRecipes.map((recipe, index) => (
+          <Recipe key={index} recipe={recipe} user={user} />
+        ))}
       </div>
     </div>
   );

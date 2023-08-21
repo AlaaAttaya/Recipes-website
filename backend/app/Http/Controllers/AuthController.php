@@ -297,17 +297,17 @@ public function updateRecipe(Request $request)
         return response()->json(['message' => 'Recipe removed successfully']);
 
     }
-
+    
     public function getUserRecipes(Request $request)
     {
         $user = Auth::user();
-        $recipes = $user->recipes()->withCount('likes')->with('comments', 'images')->get();
-        return response()->json(['recipes' => $recipes]);
+        $recipes = $user->recipes()->withCount('likes')->withCount('comments')->with('comments', 'images')->get();
+        return response()->json(['recipes' => $recipes , 'user' => $user]);
     }
     
     public function getAllRecipes(Request $request)
     {
-        $recipes = Recipe::withCount('likes')->with('comments', 'images')->get();
+        $recipes = Recipe::withCount('likes')->with('comments', 'images','user')->get();
         return response()->json(['recipes' => $recipes]);
     }
 
