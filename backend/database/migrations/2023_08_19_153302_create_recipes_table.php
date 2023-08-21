@@ -12,7 +12,7 @@ class CreateRecipesTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('cuisine');
-            $table->string('image_url')->nullable();
+            
             $table->json('ingredients');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();

@@ -12,7 +12,7 @@ class Recipe extends Model
     protected $fillable = [
         'name',
         'cuisine',
-        'image_url',
+        
         'user_id',
         'ingredients'
     ];
@@ -34,5 +34,9 @@ class Recipe extends Model
     public function shoppingLists()
     {
         return $this->belongsToMany(ShoppingList::class);
+    }
+    public function images()
+    {
+        return $this->hasMany(RecipeImages::class);
     }
 }

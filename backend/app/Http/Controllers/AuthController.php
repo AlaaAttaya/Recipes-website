@@ -15,6 +15,11 @@ use App\Models\MealPlan;
 use App\Models\Day;
 use App\Models\ShoppingList;
 use App\Models\RecipeShoppingList;
+use App\Models\RecipeImages;
+
+
+
+
 class AuthController extends Controller
 {
 
@@ -201,76 +206,76 @@ class AuthController extends Controller
     public function createRecipe(Request $request)
     {
         $user = Auth::user();
-
-        
+    
         $validatedData = $request->validate([
             'name' => 'required|string|max:100',
             'cuisine' => 'required|string|max:50',
-            'image_url' => 'image|mimes:jpeg,png,jpg|max:2048', 
-            'ingredients' => 'required|json', 
+            'image_urls.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'ingredients' => 'required|json',
         ]);
-        $image= $request->image_url;
     
-        if ($image) {
-            $imagePath = $image->store('public/images/u_' . $user->id . '_' . $user->username.'/recipes');
-            $image_path= "/storage" . str_replace('public', '', $imagePath);
-        } else {
-            $image_path= '/storage/images/profilepic.png';
-        }
-
-     
         $recipe = new Recipe();
-        $recipe->name = $validatedData['name'];
-        $recipe->cuisine = $validatedData['cuisine'];
-        $recipe->image_url = $image_path;
-        $recipe->user_id = $user->id;
-        $recipe->ingredients = $validatedData['ingredients']; 
-        $recipe->save();
-      
-        return response()->json(['message' => 'Recipe created successfully', 'recipe' => $recipe], 201);
-    }
-
-    
-    public function updateRecipe(Request $request )
-    {$recipe_id = $request->recipe_id; 
-        $user = Auth::user();
-        $recipe = Recipe::find($recipe_id);
-
-        if (!$recipe) {
-            return response()->json(['message' => 'Recipe not found']);
-        }
-
-     
-
-       
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:100',
-            'cuisine' => 'required|string|max:50',
-            'image_url' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'ingredients' => 'required|json', 
-        ]);
-
-        $image=$request->image_url;
-      
-        if ($image) {
-            $imagePath = $image->store('public/images/u_' . $user->id . '_' . $user->username.'/recipes');
-            $image_path= "/storage" . str_replace('public', '', $imagePath);
-        } else {
-            $image_path= '/storage/images/profilepic.png';
-        }
-
         $recipe->name = $request->name;
         $recipe->cuisine = $request->cuisine;
-        $recipe->image_url = $image_path;
-        
-        $recipe->ingredients = $request->ingredients; 
+        $recipe->user_id = $user->id;
+        $recipe->ingredients = $request->ingredients;
         $recipe->save();
-       
-     
-
-        return response()->json(['message' => 'Recipe updated successfully', 'recipe' => $recipe]);
+    
+        if ($request->hasFile('image_urls')) {
+            foreach ($request->file('image_urls') as $image) {
+                $imagePath = $image->store('public/images/u_' . $user->id . '_' . $user->username . '/recipes');
+                $image_path = "/storage" . str_replace('public', '', $imagePath);
+    
+                $recipeImage = new RecipeImages();
+                $recipeImage->image_url = $image_path;
+                $recipe->images()->save($recipeImage);
+            }
+        }
+    
+        return response()->json(['message' => 'Recipe created successfully', 'recipe' => $recipe]);
     }
 
+
+public function updateRecipe(Request $request)
+{
+    $user = Auth::user();
+    $recipe_id = $request->recipe_id;
+    $recipe = Recipe::find($recipe_id);
+
+    if (!$recipe) {
+        return response()->json(['message' => 'Recipe not found']);
+    }
+
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:100',
+        'cuisine' => 'required|string|max:50',
+        'image_urls.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+        'ingredients' => 'required|json',
+    ]);
+
+    $recipe->name = $request->name;
+    $recipe->cuisine = $request->cuisine;
+    $recipe->ingredients = $request->ingredients;
+    $recipe->save();
+
+    if ($request->hasFile('image_urls')) {
+        $recipe->images()->delete();
+
+        foreach ($request->file('image_urls') as $image) {
+            $imagePath = $image->store('public/images/u_' . $user->id . '_' . $user->username . '/recipes');
+            $image_path = "/storage" . str_replace('public', '', $imagePath);
+
+            $recipeImage = new RecipeImages();
+            $recipeImage->image_url = $image_path;
+            $recipe->images()->save($recipeImage);
+        }
+    }else {
+        
+        $recipe->images()->delete();
+    }
+
+    return response()->json(['message' => 'Recipe updated successfully', 'recipe' => $recipe]);
+}
 
   
     public function removeRecipe(Request $request)
@@ -293,19 +298,19 @@ class AuthController extends Controller
 
     }
 
-
     public function getUserRecipes(Request $request)
     {
         $user = Auth::user();
-        $recipes = $user->recipes()->withCount('likes')->with('comments')->get();
+        $recipes = $user->recipes()->withCount('likes')->with('comments', 'images')->get();
         return response()->json(['recipes' => $recipes]);
     }
+    
     public function getAllRecipes(Request $request)
     {
-        $user = Auth::user();
-        $recipes = $user->recipes()->withCount('likes')->with('comments')->get();
+        $recipes = Recipe::withCount('likes')->with('comments', 'images')->get();
         return response()->json(['recipes' => $recipes]);
     }
+
     public function likeRecipe(Request $request)
     {   $recipe_id = $request->recipe_id; 
         $user = Auth::user();
