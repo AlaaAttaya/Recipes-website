@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import "../styles/styles.css";
 import axios from "axios";
-import Avatar from "../Components/Avatar";
 import Navbar from "../Components/Navbar";
-import Post from "../Components/Post";
 
 const HomePage = () => {
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(false);
@@ -14,6 +12,10 @@ const HomePage = () => {
 
   const handleHome = () => {
     window.location.replace("/Home");
+  };
+
+  const handleRecipe = () => {
+    window.location.replace("/MyRecipes");
   };
 
   if (!localStorage.getItem("token")) {
@@ -54,7 +56,9 @@ const HomePage = () => {
             </button>
             <button className="burgerbuttons">Shopping List</button>
             <button className="burgerbuttons">Meal Planner</button>
-            <button className="burgerbuttons">My Recipes</button>
+            <button className="burgerbuttons" onClick={handleRecipe}>
+              My Recipes
+            </button>
           </div>
         </div>
         <div className="Search">

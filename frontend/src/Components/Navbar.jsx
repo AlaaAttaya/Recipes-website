@@ -57,7 +57,11 @@ const Navbar = ({ onBurgerClick }) => {
         <div className="burger-line" />
       </div>
       <div className="logo-container">
-        <span className="logo-text" onClick={handleHome}>
+        <span
+          className="logo-text"
+          onClick={handleHome}
+          style={{ cursor: "pointer" }}
+        >
           RECIPE REALM
         </span>
       </div>

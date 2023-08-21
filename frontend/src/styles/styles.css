@@ -327,6 +327,7 @@ a {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 40px;
+  cursor: pointer;
 }
 
 .profile-container {
@@ -375,6 +376,79 @@ a {
   color: red;
 }
 
+.recipe-card {
+  border: 1px solid #ddd;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 400px;
+}
+
+.recipe-card-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.image-nav-button {
+  background-color: #ff3e3e;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.interactions {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
+.interactions button {
+  background-color: #ff3e3e;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.interactions-svg {
+  color: white;
+}
+.recipe-images-container {
+  width: 90%;
+  margin-left: 18px;
+}
+.recipe-images img {
+  width: 100%;
+}
+
+.image-navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+.likes-label {
+  color: red;
+  font-size: 16px;
+}
+.interaction-info {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
 @media screen and (max-width: 800px) {
   .logo-container {
     flex: 1;
@@ -391,5 +465,12 @@ a {
     position: fixed;
     z-index: 9999;
     background-color: rgb(39 37 37);
+  }
+  .recipe-card {
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 370px;
+    height: 100%;
   }
 }

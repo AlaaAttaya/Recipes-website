@@ -37,6 +37,9 @@ const ProfilePage = () => {
       setImageFile(selectedImage);
     }
   };
+  const handleRecipe = () => {
+    window.location.replace("/MyRecipes");
+  };
 
   const handleEditProfile = async () => {
     const formData = new FormData();
@@ -57,6 +60,8 @@ const ProfilePage = () => {
           },
         }
       );
+      const userData0 = await response.data;
+      console.log(userData0);
       setErrorMsgProfile("Success");
     } catch (error) {
       setErrorMsgProfile("Failed To Change Pic/Username/Name");
@@ -81,9 +86,9 @@ const ProfilePage = () => {
 
       console.log(userData1);
       if (
-        userData1.message ==
+        userData1.message ===
           "The newpassword field must be at least 8 characters." ||
-        userData1.message == "Incorrect old password"
+        userData1.message === "Incorrect old password"
       ) {
         setErrorMsg("Failed To Change Password ");
       } else {
@@ -162,7 +167,9 @@ const ProfilePage = () => {
             </button>
             <button className="burgerbuttons">Shopping List</button>
             <button className="burgerbuttons">Meal Planner</button>
-            <button className="burgerbuttons">My Recipes</button>
+            <button className="burgerbuttons" onClick={handleRecipe}>
+              My Recipes
+            </button>
           </div>
         </div>
         <div className="profile-container-wrapper">

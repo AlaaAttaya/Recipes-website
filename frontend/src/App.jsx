@@ -4,6 +4,7 @@ import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import HomePage from "./Pages/HomePage";
 import ProfilePage from "./Pages/ProfilePage";
+import MyRecipesPage from "./Pages/MyRecipes";
 import "./styles/App.css";
 import "./styles/styles.css";
 
@@ -13,6 +14,7 @@ const App = () => {
       <BrowserRouter>
         <div className="app">
           <Routes>
+            <Route path="/MyRecipes" element={<MyRecipesPage />} />
             <Route path="/Profile" element={<ProfilePage />} />
             <Route path="/Home" element={<HomePage />} />
             <Route path="/" element={<LoginPage />} />
