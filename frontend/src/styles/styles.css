@@ -371,6 +371,9 @@ a {
   display: flex;
   justify-content: center;
 }
+.error-message {
+  color: red;
+}
 
 @media screen and (max-width: 800px) {
   .logo-container {
