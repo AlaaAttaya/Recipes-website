@@ -337,14 +337,14 @@ class AuthController extends Controller
 
 
         public function searchByName(Request $request)
-    {
+    {   
         $perPage = $request->query('per_page', 10);
         $searchTerm = $request->name;
 
         $recipes = Recipe::withCount('likes')
                         ->withCount('comments')
                         ->with('comments', 'images', 'user', 'ingredients')
-                        ->where('name', 'like', '%' . $searchTerm . '%')
+                        ->where('name', 'like', $searchTerm . '%')
                         ->paginate($perPage);
 
         return response()->json(['recipes' => $recipes]);
@@ -359,7 +359,7 @@ class AuthController extends Controller
         $recipes = Recipe::withCount('likes')
                         ->withCount('comments')
                         ->with('comments', 'images', 'user', 'ingredients')
-                        ->where('cuisine', 'like', '%' . $searchTerm . '%')
+                        ->where('cuisine', 'like',  $searchTerm . '%')
                         ->paginate($perPage);
 
         return response()->json(['recipes' => $recipes]);
@@ -375,7 +375,7 @@ class AuthController extends Controller
                         ->withCount('comments')
                         ->with('comments', 'images', 'user', 'ingredients')
                         ->whereHas('ingredients', function ($query) use ($ingredientName) {
-                            $query->where('name', 'like', '%' . $ingredientName . '%');
+                            $query->where('name', 'like', $ingredientName . '%');
                         })
                         ->paginate($perPage);
 

@@ -10,6 +10,71 @@ const HomePage = () => {
   const [userRecipes, setAllRecipes] = useState([]);
   const [hasMoreRecipes, setHasMoreRecipes] = useState(true);
   const [pageNumber, setPageNumber] = useState(1);
+  const [searchOption, setSearchOption] = useState("name");
+  const [searchTerm, setSearchTerm] = useState("");
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+
+    if (searchOption === "name") {
+      searchByName(value);
+    } else if (searchOption === "cuisine") {
+      searchByCuisine(value);
+    } else if (searchOption === "ingredient") {
+      searchByIngredients(value);
+    }
+  };
+  const searchByName = async (value) => {
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/user/searchbyname?name=${value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const recipes = response.data.recipes.data;
+      setAllRecipes(recipes);
+      setHasMoreRecipes(false);
+    } catch (error) {
+      console.error("Error searching by name:", error);
+    }
+  };
+  const searchByCuisine = async (value) => {
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/user/searchbycuisine?cuisine=${value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const recipes = response.data.recipes.data;
+      setAllRecipes(recipes);
+      setHasMoreRecipes(false);
+    } catch (error) {
+      console.error("Error searching by cuisine:", error);
+    }
+  };
+
+  const searchByIngredients = async (value) => {
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/user/searchbyingredients?ingredient=${value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const recipes = response.data.recipes.data;
+      setAllRecipes(recipes);
+      setHasMoreRecipes(false);
+    } catch (error) {
+      console.error("Error searching by ingredients:", error);
+    }
+  };
 
   const handleBurgerClick = () => {
     setIsLeftDivOpen(!isLeftDivOpen);
@@ -99,12 +164,46 @@ const HomePage = () => {
             </button>
           </div>
         </div>
+
         <div className="Search">
           <div className="search-container">
+            <div className="radio-buttons">
+              <label>
+                <input
+                  type="radio"
+                  name="search-option"
+                  value="name"
+                  checked={searchOption === "name"}
+                  onChange={() => setSearchOption("name")}
+                />
+                Name
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="search-option"
+                  value="cuisine"
+                  checked={searchOption === "cuisine"}
+                  onChange={() => setSearchOption("cuisine")}
+                />
+                Cuisine
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="search-option"
+                  value="ingredient"
+                  checked={searchOption === "ingredient"}
+                  onChange={() => setSearchOption("ingredient")}
+                />
+                Ingredient
+              </label>
+            </div>
             <input
               type="text"
               placeholder="Search..."
               className="search-input"
+              onKeyUp={(e) => handleSearch(e.target.value)}
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
