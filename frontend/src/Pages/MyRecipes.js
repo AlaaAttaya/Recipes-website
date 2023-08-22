@@ -7,10 +7,13 @@ const MyRecipe = () => {
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(false);
   const [userRecipes, setUserRecipes] = useState([]);
   const [user, setUser] = useState(null);
+  const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false);
   const handleBurgerClick = () => {
     setIsLeftDivOpen(!isLeftDivOpen);
   };
-
+  const toggleAddRecipe = () => {
+    setIsAddRecipeOpen(!isAddRecipeOpen);
+  };
   const handleRecipe = () => {
     window.location.replace("/MyRecipes");
   };
@@ -45,7 +48,8 @@ const MyRecipe = () => {
 
   return (
     <div className="home-page">
-      <Navbar onBurgerClick={handleBurgerClick} />
+      <Navbar onBurgerClick={handleBurgerClick} pagename="My Recipes" />
+
       <div
         className="burger-open-div"
         style={{ display: isLeftDivOpen ? "block" : "none" }}
@@ -82,7 +86,15 @@ const MyRecipe = () => {
           </button>
         </div>
       </div>
+      {isAddRecipeOpen && (
+        <div className="add-recipe-overlay">
+          <div className="add-recipe-container">{/* Add Recipe Form */}</div>
+        </div>
+      )}
       <div className="recipes-container">
+        <button onClick={toggleAddRecipe} className="add-recipe">
+          Add Recipe
+        </button>
         {userRecipes.map((recipe, index) => (
           <Recipe key={index} recipe={recipe} user={user} />
         ))}

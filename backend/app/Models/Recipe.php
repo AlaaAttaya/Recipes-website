@@ -14,7 +14,7 @@ class Recipe extends Model
         'cuisine',
         
         'user_id',
-        'ingredients'
+    
     ];
 
     public function user()
@@ -39,4 +39,9 @@ class Recipe extends Model
     {
         return $this->hasMany(RecipeImages::class);
     }
+    public function ingredients()
+    {
+        return $this->hasMany(Ingredient::class);
+    }
+   
 }

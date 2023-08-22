@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/styles.css";
 import Avatar from "./Avatar";
 
-const Navbar = ({ onBurgerClick }) => {
+const Navbar = ({ onBurgerClick, pagename }) => {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [burgermenuOpen, setburgermenuOpen] = useState(false);
@@ -62,7 +62,10 @@ const Navbar = ({ onBurgerClick }) => {
           onClick={handleHome}
           style={{ cursor: "pointer" }}
         >
-          RECIPE REALM
+          RECIPE REALM<br></br>
+        </span>
+        <span className="logo-text" style={{ fontSize: "18px" }}>
+          {pagename}
         </span>
       </div>
       <div className="navbar-menu">
