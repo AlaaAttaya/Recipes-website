@@ -333,6 +333,57 @@ class AuthController extends Controller
         return response()->json(['recipes' => $recipes]);
     }
 
+
+
+
+        public function searchByName(Request $request)
+    {
+        $perPage = $request->query('per_page', 10);
+        $searchTerm = $request->name;
+
+        $recipes = Recipe::withCount('likes')
+                        ->withCount('comments')
+                        ->with('comments', 'images', 'user', 'ingredients')
+                        ->where('name', 'like', '%' . $searchTerm . '%')
+                        ->paginate($perPage);
+
+        return response()->json(['recipes' => $recipes]);
+    }
+
+
+    public function searchByCuisine(Request $request)
+    {
+        $perPage = $request->query('per_page', 10);
+        $searchTerm = $request->cuisine;
+
+        $recipes = Recipe::withCount('likes')
+                        ->withCount('comments')
+                        ->with('comments', 'images', 'user', 'ingredients')
+                        ->where('cuisine', 'like', '%' . $searchTerm . '%')
+                        ->paginate($perPage);
+
+        return response()->json(['recipes' => $recipes]);
+    }
+
+
+        public function searchByIngredients(Request $request)
+    {
+        $perPage = $request->query('per_page', 10);
+        $ingredientName = $request->ingredient;
+
+        $recipes = Recipe::withCount('likes')
+                        ->withCount('comments')
+                        ->with('comments', 'images', 'user', 'ingredients')
+                        ->whereHas('ingredients', function ($query) use ($ingredientName) {
+                            $query->where('name', 'like', '%' . $ingredientName . '%');
+                        })
+                        ->paginate($perPage);
+
+        return response()->json(['recipes' => $recipes]);
+    }
+
+
+
     public function likeRecipe(Request $request)
     {   $recipe_id = $request->recipe_id; 
         $user = Auth::user();
