@@ -307,7 +307,10 @@ public function updateRecipe(Request $request)
     
     public function getAllRecipes(Request $request)
     {
-        $recipes = Recipe::withCount('likes')->with('comments', 'images','user')->get();
+        $perPage = $request->query('per_page', 10); 
+        $recipes = Recipe::withCount('likes')->with('comments', 'images', 'user')
+                          ->paginate($perPage);
+    
         return response()->json(['recipes' => $recipes]);
     }
 

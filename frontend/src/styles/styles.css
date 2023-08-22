@@ -382,6 +382,7 @@ a {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   width: 400px;
+  margin-bottom: 15px;
 }
 
 .recipe-card-container {
@@ -510,5 +511,6 @@ a {
     border-radius: 8px;
     width: 370px;
     height: 100%;
+    margin-bottom: 15px;
   }
 }

@@ -3,9 +3,13 @@ import "../styles/styles.css";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
 import Recipe from "../Components/Recipe";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 const HomePage = () => {
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(false);
   const [userRecipes, setAllRecipes] = useState([]);
+  const [hasMoreRecipes, setHasMoreRecipes] = useState(true);
+  const [pageNumber, setPageNumber] = useState(1);
 
   const handleBurgerClick = () => {
     setIsLeftDivOpen(!isLeftDivOpen);
@@ -22,19 +26,30 @@ const HomePage = () => {
   if (!localStorage.getItem("token")) {
     window.location.replace("/");
   }
+
   const fetchAllRecipes = async () => {
     try {
+      if (!hasMoreRecipes) {
+        return;
+      }
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/user/getallrecipes",
+        `http://127.0.0.1:8000/api/user/getallrecipes?page=${pageNumber}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
-      const recipes = response.data.recipes;
-
-      setAllRecipes(recipes);
+      const recipes = response.data.recipes.data;
+      console.log("reeeecccc", recipes);
+      if (recipes.length === 0) {
+        setHasMoreRecipes(false);
+      } else {
+        setAllRecipes((prevRecipes) =>
+          pageNumber === 1 ? recipes : [...prevRecipes, ...recipes]
+        );
+        setPageNumber(pageNumber + 1);
+      }
     } catch (error) {
       console.error("Error fetching user recipes:", error);
     }
@@ -42,7 +57,7 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchAllRecipes();
-  }, []);
+  }, [pageNumber]);
 
   return (
     <>
@@ -108,9 +123,17 @@ const HomePage = () => {
             </svg>
           </div>
           <div className="Recipes">
-            {userRecipes.map((recipe, index) => (
-              <Recipe key={index} recipe={recipe} user={recipe.user} />
-            ))}
+            <InfiniteScroll
+              dataLength={userRecipes.length}
+              next={fetchAllRecipes}
+              hasMore={hasMoreRecipes}
+              loader={<p>Loading...</p>}
+              endMessage={<p>No more recipes to load.</p>}
+            >
+              {userRecipes.map((recipe, index) => (
+                <Recipe key={index} recipe={recipe} user={recipe.user} />
+              ))}
+            </InfiniteScroll>
           </div>
         </div>
       </div>
