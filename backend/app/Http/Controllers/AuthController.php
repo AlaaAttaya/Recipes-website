@@ -258,7 +258,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:100',
             'cuisine' => 'required|string|max:50',
             'image_urls.*' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'ingredients.*' => 'required|array',
+            'ingredients.*' => 'required|string',
         ]);
     
         $recipe->name = $request->name;
@@ -266,11 +266,16 @@ class AuthController extends Controller
         $recipe->save();
     
         $recipe->ingredients()->delete();
-        foreach ($request->ingredients as $ingredient) {
-            $newIngredient = new Ingredient();
-            $newIngredient->name = $ingredient['name'];
-            $newIngredient->amount = $ingredient['amount'];
-            $recipe->ingredients()->save($newIngredient);
+
+        foreach ($request->ingredients as $ingredientJson) {
+            $ingredientData = json_decode($ingredientJson, true);
+        
+           
+                $newIngredient = new Ingredient();
+                $newIngredient->name = $ingredientData['name'];
+                $newIngredient->amount = $ingredientData['amount'];
+                $recipe->ingredients()->save($newIngredient);
+            
         }
     
         if ($request->hasFile('image_urls')) {
@@ -322,7 +327,7 @@ class AuthController extends Controller
     public function getAllRecipes(Request $request)
     {
         $perPage = $request->query('per_page', 10); 
-        $recipes = Recipe::withCount('likes')->with('comments', 'images', 'user','ingredients')
+        $recipes = Recipe::withCount('likes')->withCount('comments')->with('comments', 'images', 'user','ingredients')
                           ->paginate($perPage);
     
         return response()->json(['recipes' => $recipes]);

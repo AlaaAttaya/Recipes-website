@@ -32,8 +32,7 @@ const RecipeCard = ({ recipe, user }) => {
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
-  const parsedIngredients = JSON.parse(ingredients);
-  console.log(parsedIngredients);
+
   return (
     <div className="recipe-card">
       <div className="recipe-card-container">
@@ -100,15 +99,16 @@ const RecipeCard = ({ recipe, user }) => {
         </div>
         <div className="ingredients">
           <h4>Ingredients:</h4>
+
           <ul>
-            {Object.entries(parsedIngredients).map(
-              ([ingredient, amount], index) => (
-                <li key={index}>
-                  {ingredient}:{amount}
-                </li>
-              )
-            )}
+            {ingredients.map((ingredient, index) => (
+              <li key={index}>
+                {ingredient.name}: {ingredient.amount}
+              </li>
+            ))}
           </ul>
+
+          {console.log("ingredients", ingredients)}
         </div>
         <div className="interaction-info">
           <label className="interactions-label"> {likes_count} Likes</label>
