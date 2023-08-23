@@ -9,8 +9,7 @@ import {
   WhatsappShareButton,
 } from "react-share";
 
-const RecipeCard = ({ recipe, user, viewer }) => {
-  console.log(recipe.images);
+const RecipeCard = ({ recipe, user, viewer, is_shoppingList }) => {
   const {
     name,
     cuisine,
@@ -27,7 +26,6 @@ const RecipeCard = ({ recipe, user, viewer }) => {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(recipe.comments);
-  const [shopping_list_id, setShoppingId] = useState(0);
   const [displaylabel, setDisplayLabel] = useState("");
   console.log("viewer", viewer);
   const addComment = async () => {
@@ -104,9 +102,43 @@ const RecipeCard = ({ recipe, user, viewer }) => {
       });
       const userData = await response.json();
       const shopping_list_id = userData.data.shopping_lists[0].id;
-      setShoppingId(shopping_list_id);
-
       addRecipeToShoppingList(recipe.id, shopping_list_id);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      localStorage.removeItem("token");
+      window.location.replace("/");
+    }
+  };
+
+  const RemovalShoppingList = async (shopping_list_id) => {
+    try {
+      const response = await axios.delete(
+        `http://127.0.0.1:8000/api/user/shopping-lists/remove-recipe?shopping_list_id=${shopping_list_id}&recipe_id=${recipe.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log(response.data.message);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error removing recipe from shopping list:", error);
+    }
+  };
+
+  const RemoveshoppingList = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/user/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const userData = await response.json();
+      const shopping_list_id = userData.data.shopping_lists[0].id;
+      RemovalShoppingList(shopping_list_id);
     } catch (error) {
       console.error("Error fetching user profile:", error);
       localStorage.removeItem("token");
@@ -239,11 +271,11 @@ const RecipeCard = ({ recipe, user, viewer }) => {
               </svg>
             </button>
             <div className="interaction-info">
-              <label className="interactions-label"> {likes_count} Likes</label>
-              <label className="interactions-label">
+              <span className="interactions-label"> {likes_count} Likes</span>
+              <span className="interactions-label">
                 {" "}
                 {comments_count} Comments
-              </label>
+              </span>
             </div>
             <button className="image-nav-button" onClick={nextImage}>
               <svg
@@ -511,29 +543,53 @@ const RecipeCard = ({ recipe, user, viewer }) => {
           </svg>
         </button>
       </div>
-      <button
-        className="shoppinglist-button"
-        title="Add To ShoppingList"
-        onClick={shoppingList}
-      >
-        <label style={{ color: "white" }}>{displaylabel}</label>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="feather feather-shopping-bag"
+      {!is_shoppingList && (
+        <button
+          className="shoppinglist-button"
+          title="Add To ShoppingList"
+          onClick={shoppingList}
         >
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-      </button>
+          <span style={{ color: "white" }}>{displaylabel}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="feather feather-shopping-bag"
+          >
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+        </button>
+      )}
+      {is_shoppingList && (
+        <button
+          className="removeshoppinglist-button"
+          title="Remove From ShoppingList"
+          onClick={RemoveshoppingList}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="feather feather-minus"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };

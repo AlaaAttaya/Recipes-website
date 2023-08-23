@@ -557,17 +557,22 @@ class AuthController extends Controller
     public function removeRecipeShoppingList(Request $request)
     {
         $user = Auth::user();
-        $recipeShoppingListId = $request->recipe_shopping_list_id;
+        $shoppingListId = $request->shopping_list_id;
+        $recipeId = $request->recipe_id;
     
-        $recipeShoppingList = RecipeShoppingList::find($recipeShoppingListId);
+        $recipeShoppingList = RecipeShoppingList::where([
+            'shopping_list_id' => $shoppingListId,
+            'recipe_id' => $recipeId,
+        ])->first();
     
         if (!$recipeShoppingList) {
             return response()->json(['message' => 'Recipe shopping list not found']);
         }
     
         $shoppingList = $recipeShoppingList->shoppingList;
+    
         if (!$shoppingList || $shoppingList->user_id !== $user->id) {
-            return unauthorized();
+            return response()->unauthorized();
         }
     
         $recipeShoppingList->delete();

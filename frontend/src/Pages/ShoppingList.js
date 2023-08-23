@@ -129,6 +129,7 @@ const ShoppingList = () => {
             recipe={recipe}
             user={recipe.user}
             viewer={thisuser}
+            is_shoppingList={true}
           />
         ))}
       </div>
