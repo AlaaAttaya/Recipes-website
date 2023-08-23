@@ -12,6 +12,7 @@ const HomePage = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [searchOption, setSearchOption] = useState("name");
   const [searchTerm, setSearchTerm] = useState("");
+  const [user, setUser] = useState(null);
   const handleSearch = (value) => {
     setSearchTerm(value);
 
@@ -23,6 +24,26 @@ const HomePage = () => {
       searchByIngredients(value);
     }
   };
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/user/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const userData = await response.json();
+
+      setUser(userData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      localStorage.removeItem("token");
+      window.location.replace("/");
+    }
+  };
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
   const searchByName = async (value) => {
     try {
       const response = await axios.get(
@@ -230,7 +251,12 @@ const HomePage = () => {
               endMessage={<p>No more recipes to load.</p>}
             >
               {userRecipes.map((recipe, index) => (
-                <Recipe key={index} recipe={recipe} user={recipe.user} />
+                <Recipe
+                  key={index}
+                  recipe={recipe}
+                  user={recipe.user}
+                  viewer={user}
+                />
               ))}
             </InfiniteScroll>
           </div>

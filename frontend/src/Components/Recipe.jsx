@@ -17,7 +17,6 @@ const RecipeCard = ({ recipe, user, viewer }) => {
     ingredients,
     images,
     likes_count,
-    comments,
     comments_count,
     user_liked,
   } = recipe;
@@ -26,6 +25,41 @@ const RecipeCard = ({ recipe, user, viewer }) => {
   const [is_user_liked, setUserLiked] = useState(user_liked);
   const recipeUrl = `http://127.0.0.1:3000/Home`;
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState(recipe.comments);
+  console.log("viewer", viewer);
+  const addComment = async () => {
+    if (newComment.trim() === "") {
+      return;
+    }
+
+    try {
+      await axios.post(
+        "http://127.0.0.1:8000/api/user/comment",
+        {
+          recipe_id: recipe.id,
+          body: newComment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const newCommentObj = {
+        body: newComment,
+        user: {
+          image: viewer.data.image,
+          username: viewer.data.username,
+        },
+      };
+
+      setComments((prevComments) => prevComments.concat(newCommentObj));
+      setNewComment("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
 
   const openShareMenu = () => {
     setShowShareMenu(true);
@@ -244,9 +278,33 @@ const RecipeCard = ({ recipe, user, viewer }) => {
         {showComments && (
           <div className="Comments">
             <h4>Comments</h4>
-            <ul>
+
+            <ul style={{ width: "80%", listStyleType: "none" }}>
+              <li className="add-comment">
+                <input
+                  type="text"
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+                <button onClick={addComment}>Add</button>
+              </li>
               {comments.map((comment, index) => (
-                <li key={index}>{comment}</li>
+                <li className="comment" key={index}>
+                  <img
+                    src={`http://127.0.0.1:8000${comment.user.image}`}
+                    style={{
+                      width: "35px",
+                      height: "35px",
+                      marginBottom: "-5px",
+                      borderRadius: "50%",
+                    }}
+                  />
+                  <span style={{ fontWeight: "bolder", fontSize: "20px" }}>
+                    {comment.user.username}
+                  </span>
+                  :&nbsp;{comment.body}
+                </li>
               ))}
             </ul>
           </div>
@@ -271,6 +329,9 @@ const RecipeCard = ({ recipe, user, viewer }) => {
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
                 </button>
+                <div style={{ textAlign: "center", fontSize: "24px" }}>
+                  Share
+                </div>
               </div>
               <div className="buttons-share">
                 <FacebookShareButton url={recipeUrl} onClick={closeShareMenu}>

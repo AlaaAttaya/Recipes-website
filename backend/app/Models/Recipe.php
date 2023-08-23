@@ -29,8 +29,9 @@ class Recipe extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->with('user'); 
     }
+
     public function shoppingLists()
     {
         return $this->belongsToMany(ShoppingList::class);

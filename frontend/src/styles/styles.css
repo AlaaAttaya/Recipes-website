@@ -632,6 +632,41 @@ a {
   justify-content: center;
 }
 
+.Comments {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.add-comment {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-comment input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-comment button {
+  padding: 8px 12px;
+  background-color: #ff3e3e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.comment {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
 @media screen and (max-width: 800px) {
   .logo-container {
     flex: 1;
