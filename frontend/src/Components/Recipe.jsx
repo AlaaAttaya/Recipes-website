@@ -27,6 +27,8 @@ const RecipeCard = ({ recipe, user, viewer }) => {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState(recipe.comments);
+  const [shopping_list_id, setShoppingId] = useState(0);
+  const [displaylabel, setDisplayLabel] = useState("");
   console.log("viewer", viewer);
   const addComment = async () => {
     if (newComment.trim() === "") {
@@ -46,11 +48,20 @@ const RecipeCard = ({ recipe, user, viewer }) => {
           },
         }
       );
+
       const newCommentObj = {
         body: newComment,
         user: {
-          image: viewer.data.image,
-          username: viewer.data.username,
+          image:
+            viewer.data &&
+            viewer.data.image !== undefined &&
+            viewer.data.image !== ""
+              ? viewer.data.image
+              : user.image,
+          username:
+            viewer.data && viewer.data.username !== undefined
+              ? viewer.data.username
+              : user.username,
         },
       };
 
@@ -60,7 +71,50 @@ const RecipeCard = ({ recipe, user, viewer }) => {
       console.error("Error adding comment:", error);
     }
   };
+  const editRecipe = () => {};
+  const addRecipeToShoppingList = async (recipeId, shoppingListId) => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/user/shopping-lists/add-recipe",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            recipe_id: recipeId,
+            shopping_list_id: shoppingListId,
+          }),
+        }
+      );
 
+      const responseData = await response.json();
+      setDisplayLabel(responseData.message + " ");
+    } catch (error) {
+      console.error("Error adding recipe to shopping list:", error);
+    }
+  };
+  const shoppingList = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/user/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const userData = await response.json();
+      const shopping_list_id = userData.data.shopping_lists[0].id;
+      setShoppingId(shopping_list_id);
+
+      addRecipeToShoppingList(recipe.id, shopping_list_id);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      localStorage.removeItem("token");
+      window.location.replace("/");
+    }
+  };
+
+  const mealPlanner = () => {};
   const openShareMenu = () => {
     setShowShareMenu(true);
   };
@@ -287,7 +341,7 @@ const RecipeCard = ({ recipe, user, viewer }) => {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                 />
-                <button onClick={addComment}>Add</button>
+                <button onClick={addComment}>Send</button>
               </li>
               {comments.map((comment, index) => (
                 <li className="comment" key={index}>
@@ -321,9 +375,9 @@ const RecipeCard = ({ recipe, user, viewer }) => {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -395,9 +449,9 @@ const RecipeCard = ({ recipe, user, viewer }) => {
                     ></path>
                     <path
                       fill="#fff"
-                      fill-rule="evenodd"
+                      fillRule="evenodd"
                       d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                     ></path>
                   </svg>
                 </WhatsappShareButton>
@@ -423,7 +477,63 @@ const RecipeCard = ({ recipe, user, viewer }) => {
             </svg>
           </button>
         )}
+        {viewer && viewer.id === recipe.user_id && (
+          <button className="edit-button" onClick={editRecipe}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              x="0px"
+              y="0px"
+              width="20"
+              height="20"
+              viewBox="0 0 32 32"
+              fill="#fff"
+            >
+              <path d="M 23.90625 3.96875 C 22.859375 3.96875 21.8125 4.375 21 5.1875 L 5.1875 21 L 5.125 21.3125 L 4.03125 26.8125 L 3.71875 28.28125 L 5.1875 27.96875 L 10.6875 26.875 L 11 26.8125 L 26.8125 11 C 28.4375 9.375 28.4375 6.8125 26.8125 5.1875 C 26 4.375 24.953125 3.96875 23.90625 3.96875 Z M 23.90625 5.875 C 24.410156 5.875 24.917969 6.105469 25.40625 6.59375 C 26.378906 7.566406 26.378906 8.621094 25.40625 9.59375 L 24.6875 10.28125 L 21.71875 7.3125 L 22.40625 6.59375 C 22.894531 6.105469 23.402344 5.875 23.90625 5.875 Z M 20.3125 8.71875 L 23.28125 11.6875 L 11.1875 23.78125 C 10.53125 22.5 9.5 21.46875 8.21875 20.8125 Z M 6.9375 22.4375 C 8.136719 22.921875 9.078125 23.863281 9.5625 25.0625 L 6.28125 25.71875 Z"></path>
+            </svg>
+          </button>
+        )}
+        <button
+          className="mealplanner-button"
+          title="Add To MealPlanner"
+          onClick={mealPlanner}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="currentColor"
+            className="bi bi-card-list"
+            viewBox="0 0 16 16"
+          >
+            {" "}
+            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z" />{" "}
+            <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" />{" "}
+          </svg>
+        </button>
       </div>
+      <button
+        className="shoppinglist-button"
+        title="Add To ShoppingList"
+        onClick={shoppingList}
+      >
+        <label style={{ color: "white" }}>{displaylabel}</label>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="feather feather-shopping-bag"
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+      </button>
     </div>
   );
 };

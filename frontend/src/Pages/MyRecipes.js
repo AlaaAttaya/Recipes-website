@@ -110,7 +110,12 @@ const MyRecipe = () => {
   const handleHome = () => {
     window.location.replace("/Home");
   };
-
+  const handleshoppingpage = () => {
+    window.location.replace("/ShoppingList");
+  };
+  const handlemealplanner = () => {
+    window.location.replace("/MealPlanner");
+  };
   const fetchUserRecipes = async () => {
     try {
       const response = await axios.get(
@@ -168,8 +173,12 @@ const MyRecipe = () => {
             {" "}
             Home{" "}
           </button>
-          <button className="burgerbuttons">Shopping List</button>
-          <button className="burgerbuttons">Meal Planner</button>
+          <button className="burgerbuttons" onClick={handleshoppingpage}>
+            Shopping List
+          </button>
+          <button className="burgerbuttons" onClick={handlemealplanner}>
+            Meal Planner
+          </button>
           <button className="burgerbuttons" onClick={handleRecipe}>
             My Recipes
           </button>
@@ -334,7 +343,7 @@ const MyRecipe = () => {
                   className="button-ingredient"
                   onClick={saveRecipe}
                 >
-                  Save
+                  Create
                 </button>
               </div>
             </div>

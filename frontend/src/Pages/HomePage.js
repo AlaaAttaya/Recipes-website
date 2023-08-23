@@ -108,7 +108,12 @@ const HomePage = () => {
   const handleRecipe = () => {
     window.location.replace("/MyRecipes");
   };
-
+  const handleshoppingpage = () => {
+    window.location.replace("/ShoppingList");
+  };
+  const handlemealplanner = () => {
+    window.location.replace("/MealPlanner");
+  };
   if (!localStorage.getItem("token")) {
     window.location.replace("/");
   }
@@ -178,8 +183,12 @@ const HomePage = () => {
               {" "}
               Home{" "}
             </button>
-            <button className="burgerbuttons">Shopping List</button>
-            <button className="burgerbuttons">Meal Planner</button>
+            <button className="burgerbuttons" onClick={handleshoppingpage}>
+              Shopping List
+            </button>
+            <button className="burgerbuttons" onClick={handlemealplanner}>
+              Meal Planner
+            </button>
             <button className="burgerbuttons" onClick={handleRecipe}>
               My Recipes
             </button>

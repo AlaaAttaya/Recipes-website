@@ -36,9 +36,12 @@ class AuthController extends Controller
 
     public function profile(Request $request)
     {
+        $user = Auth::user();
+        $user->load('mealPlans.days', 'shoppingLists'); 
+    
         return response()->json([
             'status' => 'Success',
-            'data' => Auth::user(),
+            'data' => $user,
         ], 200);
     }
 
@@ -482,15 +485,22 @@ class AuthController extends Controller
         return response()->json(['message' => 'Shopping list created successfully', 'shoppingList' => $shoppingList]);
     }
 
-    public function getUserShoppingList(Request $request)
+        public function getUserShoppingList(Request $request)
     {
         $user = Auth::user();
-        
-        $shoppingLists = $user->shoppingLists;
-        
-        return response()->json(['shoppingLists' => $shoppingLists]);
-    }
+        $shoppingListId = $request->shopping_list_id;
 
+        $shoppingList = ShoppingList::find($shoppingListId);
+
+        if (!$shoppingList) {
+            return response()->json(['message' => 'Shopping List not found']);
+        }
+
+        
+        $recipes = $shoppingList->recipes()->with('likes', 'comments', 'images', 'ingredients','user')->withCount('likes')->withCount('comments')->get();
+
+        return response()->json(['shoppingList' => $shoppingList, 'recipes' => $recipes ]);
+    }
 
     public function removeShoppingList(Request $request)
     {
