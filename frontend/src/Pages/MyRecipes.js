@@ -51,6 +51,7 @@ const MyRecipe = () => {
       );
 
       console.log("Recipe saved:", response.data);
+      window.location.replace("/MyRecipes");
     } catch (error) {
       console.error("Error saving recipe:", error);
     }
@@ -345,7 +346,7 @@ const MyRecipe = () => {
           Add Recipe
         </button>
         {userRecipes.map((recipe, index) => (
-          <Recipe key={index} recipe={recipe} user={user} />
+          <Recipe key={index} recipe={recipe} user={user} viewer={user} />
         ))}
       </div>
     </div>

@@ -98,8 +98,12 @@ class AuthController extends Controller
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
         $user->image=$image_path;
-     
         $user->save();
+
+        $shoppingList = new ShoppingList();
+        $shoppingList->name = "Shopping List";
+        $shoppingList->user_id = $user->id;
+        $shoppingList->save();
 
         $token = Auth::login($user);
         $user->token = $token;

@@ -16,7 +16,7 @@ class Recipe extends Model
         'user_id',
     
     ];
-
+    protected $appends = ['user_liked'];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -43,5 +43,17 @@ class Recipe extends Model
     {
         return $this->hasMany(Ingredient::class);
     }
+   
+
+    public function getUserLikedAttribute()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
    
 }
