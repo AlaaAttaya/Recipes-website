@@ -19,12 +19,12 @@ const RecipeCard = ({ recipe, user, viewer }) => {
     likes_count,
     comments,
     comments_count,
-    user_liked1,
+    user_liked,
   } = recipe;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
-  const [user_liked, setUserLiked] = useState(user_liked1);
-  const recipeUrl = `http://127.0.0.1:8000/Home`;
+  const [is_user_liked, setUserLiked] = useState(user_liked);
+  const recipeUrl = `http://127.0.0.1:3000/Home`;
   const [showShareMenu, setShowShareMenu] = useState(false);
 
   const openShareMenu = () => {
@@ -192,19 +192,19 @@ const RecipeCard = ({ recipe, user, viewer }) => {
           <button
             className="like-button"
             style={{ marginLeft: "10px" }}
-            onClick={user_liked ? handleUnlike : handleLike}
+            onClick={is_user_liked ? handleUnlike : handleLike}
           >
             <svg
               className="interaction-svg"
               width="25px"
               height="25px"
               viewBox="0 0 24 24"
-              fill={user_liked ? "orange" : "none"}
+              fill={is_user_liked ? "orange" : "none"}
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 d="M15.7 4C18.87 4 21 6.98 21 9.76C21 15.39 12.16 20 12 20C11.84 20 3 15.39 3 9.76C3 6.98 5.13 4 8.3 4C10.12 4 11.31 4.91 12 5.71C12.69 4.91 13.88 4 15.7 4Z"
-                stroke={user_liked ? "orange" : "#fff"}
+                stroke={is_user_liked ? "orange" : "#fff"}
                 strokeWidth="2"
               />
             </svg>
