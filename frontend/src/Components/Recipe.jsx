@@ -80,6 +80,13 @@ const RecipeCard = ({ recipe, user }) => {
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
+            <div className="interaction-info">
+              <label className="interactions-label"> {likes_count} Likes</label>
+              <label className="interactions-label">
+                {" "}
+                {comments_count} Comments
+              </label>
+            </div>
             <button className="image-nav-button" onClick={nextImage}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,13 +117,7 @@ const RecipeCard = ({ recipe, user }) => {
 
           {console.log("ingredients", ingredients)}
         </div>
-        <div className="interaction-info">
-          <label className="interactions-label"> {likes_count} Likes</label>
-          <label className="interactions-label">
-            {" "}
-            {comments_count} Comments
-          </label>
-        </div>
+
         <div className="interactions">
           <button className="like-button" style={{ marginLeft: "10px" }}>
             <svg

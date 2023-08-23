@@ -209,7 +209,7 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:100',
             'cuisine' => 'required|string|max:50',
-            'image_urls.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'image_urls.*' => 'image|mimes:jpeg,png,jpg|max:51200',
             'ingredients.*' => 'required|string',
         ]);
     

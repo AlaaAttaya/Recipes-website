@@ -298,6 +298,14 @@ a {
   cursor: pointer;
   color: #ff3d1b;
 }
+.addrecipe-close-button {
+  border: none;
+  margin-top: 10px;
+  margin-left: 10px;
+  background-color: transparent;
+  cursor: pointer;
+  color: #ff3d1b;
+}
 .burger-close-btn:hover {
   color: #ff3d1b55;
 }
@@ -447,7 +455,7 @@ a {
 }
 .interaction-info {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-content: center;
   justify-content: center;
   align-items: center;
@@ -490,7 +498,6 @@ a {
   align-items: center;
 }
 
-/* MyRecipe.css */
 .add-recipe-overlay {
   position: fixed;
   top: 0;
@@ -502,6 +509,11 @@ a {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  overflow: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-recipe-container {
@@ -510,7 +522,10 @@ a {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 80%;
-  max-width: 400px;
+  max-width: 450px;
+
+  max-height: 90%;
+  overflow: auto;
 }
 
 .add-recipe {
@@ -524,7 +539,47 @@ a {
   padding: 10px 20px;
   cursor: pointer;
 }
-
+.form-group-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.form-group {
+  margin-bottom: 5px;
+}
+.recipeNamelabel {
+  margin-right: 15px;
+}
+.recipeCuisinelabel {
+  margin-right: 4px;
+}
+.form-group input {
+  width: 92%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #dbdbdb;
+  background-color: #f7f7f7;
+}
+.form-group-images {
+  margin-left: 0px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 57%;
+}
+.button-ingredient {
+  background-color: #ff3e3e;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.removebutton {
+  margin-bottom: 10px;
+}
 @media screen and (max-width: 800px) {
   .logo-container {
     flex: 1;
