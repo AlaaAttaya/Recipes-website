@@ -46,7 +46,8 @@ Route::group(["middleware" => "auth:api"], function () {
         Route::post('meal-plans/add-recipe-to-day',  [AuthController::class, 'addRecipeToDay']);
         Route::delete('meal-plans/remove-recipe-from-day', [AuthController::class, 'removeRecipeFromDay']);
        
-
+        Route::post('add-recipe-to-mealtoplan', [AuthController::class, 'addRecipeToMealPlan']);
+        Route::post('remove-recipe-from-mealtoplan', [AuthController::class, 'removeRecipeFromMealPlan']);
     });
 
 });

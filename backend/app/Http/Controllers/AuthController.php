@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Carbon;
 use App\Models\User;
 use App\Models\Like;
 use App\Models\Recipe;
@@ -17,8 +17,7 @@ use App\Models\ShoppingList;
 use App\Models\RecipeShoppingList;
 use App\Models\RecipeImages;
 use App\Models\Ingredient;
-
-
+use Illuminate\Support\Facades\Log; 
 class AuthController extends Controller
 {
 
@@ -32,19 +31,26 @@ class AuthController extends Controller
         ], 401);
     }
 
-
-
     public function profile(Request $request)
     {
         $user = Auth::user();
-        $user->load('mealPlans.days', 'shoppingLists'); 
+        $user->load([
+            'mealPlans.days.recipes.user',
+            'mealPlans.days.recipes.images', 
+            'mealPlans.days.recipes.ingredients',
+            'mealPlans.days.recipes' => function ($query) {
+                $query->with(['likes', 'comments' => function ($query) {
+                    $query->with('user');
+                }])->withCount(['likes', 'comments'])->withPivot('meal_type');
+            },
+            'shoppingLists'
+        ]);
     
         return response()->json([
             'status' => 'Success',
             'data' => $user,
-        ], 200);
+        ]);
     }
-
   public function login(Request $request)
 {
     $request->validate([
@@ -108,6 +114,12 @@ class AuthController extends Controller
         $shoppingList->user_id = $user->id;
         $shoppingList->save();
 
+        $mealPlan = new MealPlan();
+    
+        $mealPlan->name = "Meal Plan";
+        $mealPlan->user_id = $user->id;
+    
+        $mealPlan->save();
         $token = Auth::login($user);
         $user->token = $token;
         
@@ -628,35 +640,37 @@ class AuthController extends Controller
 
 
 
-        public function addDayToMealPlan(Request $request)
+ 
+    public function addDayToMealPlan(Request $request)
     {
         $mealPlanId = $request->meal_plan_id;
         $user = Auth::user();
-
+    
         $mealPlan = MealPlan::where('user_id', $user->id)->find($mealPlanId);
-
+    
         if (!$mealPlan) {
             return response()->json(['message' => 'Meal Plan not found']);
         }
-
-        $date = $request->date;
-        
-        
-        $existingDay = $mealPlan->days()->where('date', $date)->first();
+    
+        $dateString = $request->date;
+        $date = Carbon::parse($dateString)->format('Y-m-d'); 
+    
+       
+        $newDate = Carbon::parse($date)->addDay()->format('Y-m-d');
+    
+        $existingDay = $mealPlan->days()->whereDate('date', $newDate)->first();
+    
         if ($existingDay) {
-            return response()->json(['message' => 'Day with the same date already exists']);
+            return response()->json(['message' => 'Day with the same date already exists', 'day' => $existingDay]);
         }
-
+    
         $day = new Day;
-        $day->date = $date;
+        $day->date = $newDate;
         $mealPlan->days()->save($day);
-
+    
         return response()->json(['message' => 'Day added to meal plan', 'day' => $day]);
     }
-
-
-
-
+    
         public function addRecipeToDay(Request $request)
     {
         $user = Auth::user();
@@ -725,6 +739,5 @@ class AuthController extends Controller
 
 
   
-
 
 }

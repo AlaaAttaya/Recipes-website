@@ -40,6 +40,12 @@ const ProfilePage = () => {
   const handleRecipe = () => {
     window.location.replace("/MyRecipes");
   };
+  const handleshoppingpage = () => {
+    window.location.replace("/ShoppingList");
+  };
+  const handlemealplanner = () => {
+    window.location.replace("/MealPlanner");
+  };
 
   const handleEditProfile = async () => {
     const formData = new FormData();
@@ -135,7 +141,7 @@ const ProfilePage = () => {
   return (
     <>
       <div className="editProfile ">
-        <Navbar onBurgerClick={handleBurgerClick} />
+        <Navbar onBurgerClick={handleBurgerClick} pagename="My Profile" />
         <div
           className="burger-open-div"
           style={{ display: isLeftDivOpen ? "block" : "none" }}
@@ -165,8 +171,12 @@ const ProfilePage = () => {
               {" "}
               Home{" "}
             </button>
-            <button className="burgerbuttons">Shopping List</button>
-            <button className="burgerbuttons">Meal Planner</button>
+            <button className="burgerbuttons" onClick={handleshoppingpage}>
+              Shopping List
+            </button>
+            <button className="burgerbuttons" onClick={handlemealplanner}>
+              Meal Planner
+            </button>
             <button className="burgerbuttons" onClick={handleRecipe}>
               My Recipes
             </button>

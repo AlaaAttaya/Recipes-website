@@ -18,4 +18,5 @@ class Day extends Model
         return $this->belongsToMany(Recipe::class, 'day_recipe');
     }
     
+    
 }

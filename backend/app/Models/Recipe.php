@@ -45,7 +45,6 @@ class Recipe extends Model
         return $this->hasMany(Ingredient::class);
     }
    
-
     public function getUserLikedAttribute()
     {
         $user = auth()->user();

@@ -8,7 +8,7 @@ const ShoppingList = () => {
   const [userRecipes, setUserRecipes] = useState([]);
 
   const [thisuser, setThisUser] = useState(null);
-  const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false);
+
   const [shopping_list_id, setShoppingId] = useState(0);
 
   const getShoppingListRecipes = async (shoppingListId) => {
@@ -57,9 +57,7 @@ const ShoppingList = () => {
   const handleBurgerClick = () => {
     setIsLeftDivOpen(!isLeftDivOpen);
   };
-  const toggleAddRecipe = () => {
-    setIsAddRecipeOpen(!isAddRecipeOpen);
-  };
+
   const handleRecipe = () => {
     window.location.replace("/MyRecipes");
   };
@@ -115,9 +113,6 @@ const ShoppingList = () => {
           </button>
           <button className="burgerbuttons" onClick={handleRecipe}>
             My Recipes
-          </button>
-          <button className="burgerbuttons" onClick={toggleAddRecipe}>
-            Add Recipe
           </button>
         </div>
       </div>

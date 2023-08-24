@@ -13,5 +13,6 @@ class DayRecipe extends Model
     protected $fillable = [
         'day_id',
         'recipe_id',
+        'meal_type'
     ];
 }
